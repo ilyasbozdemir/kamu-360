@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { PrintJob, usePrintHub } from "@/lib/print-hub-context";
 import { UniversalDocumentModal } from "@/components/document-preview/universal-document-modal";
 import { BrandLogo } from "@/components/ui/brand-logo";
+import { useModule, MODULE_DEFINITIONS, ModuleKey } from "@/lib/module-context";
 import {
   AlertCircle,
   AlertTriangle,
@@ -71,6 +72,8 @@ type ActiveDropdown =
 
 export function Header({ menuOpen, onToggleMenu }: HeaderProps) {
   const pathname = usePathname();
+  const { activeModule, setActiveModule, currentModule } = useModule();
+  const [isHeaderModuleOpen, setIsHeaderModuleOpen] = useState(false);
   const { printQueue, removeFromPrintQueue, clearPrintQueue, batchPrint } =
     usePrintHub();
   const [activeDropdown, setActiveDropdown] = useState<ActiveDropdown>(null);
@@ -447,23 +450,80 @@ export function Header({ menuOpen, onToggleMenu }: HeaderProps) {
             </div>
           </Link>
           <span className="mx-3 hidden h-4 w-px bg-[#cbd5e1] sm:inline-block" />
-          <div className="hidden sm:flex items-center gap-2">
-            <span
-              className={`text-[13px] font-bold ${
-                isGelir ? "text-[#7c3aed]" : "text-[#1e293b]"
-              }`}
+          {/* İNTERAKTİF HEADER MODÜL SEÇİCİ */}
+          <div className="relative hidden sm:block">
+            <button
+              type="button"
+              onClick={() => setIsHeaderModuleOpen(!isHeaderModuleOpen)}
+              className="flex items-center gap-2 px-2.5 py-1 rounded-lg border border-[#e2e8f0] bg-[#f8fafc] hover:bg-[#f1f5f9] text-left transition group shadow-2xs"
             >
-              {currentModuleTitle}
-            </span>
-            <span
-              className={`rounded px-1.5 py-0.5 text-[10px] font-bold tracking-tight ${
-                isGelir
-                  ? "border border-purple-200 bg-purple-50 text-[#7c3aed]"
-                  : "border border-blue-200 bg-blue-50 text-[#2d62d7]"
-              }`}
-            >
-              {currentModuleBadge}
-            </span>
+              <div
+                className="size-5 rounded-md flex items-center justify-center shrink-0"
+                style={{ backgroundColor: `${currentModule.color}20`, color: currentModule.color }}
+              >
+                <currentModule.icon className="size-3.5" />
+              </div>
+              <span className="text-[12px] font-bold text-[#1e293b]">
+                {currentModule.shortName}
+              </span>
+              <span
+                className="rounded px-1.5 py-0.2 text-[9.5px] font-bold"
+                style={{ backgroundColor: `${currentModule.color}15`, color: currentModule.color }}
+              >
+                {currentModule.badge}
+              </span>
+              <ChevronDown className="size-3 text-[#94a3b8] group-hover:text-[#475569] transition" />
+            </button>
+
+            {isHeaderModuleOpen && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setIsHeaderModuleOpen(false)} />
+                <div className="absolute left-0 top-full mt-2 w-72 z-50 rounded-xl bg-white p-2 shadow-2xl border border-[#cbd5e1] space-y-1 animate-in fade-in">
+                  <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#94a3b8]">
+                    ÇALIŞMA ALANI & MODÜL SEÇİMİ
+                  </div>
+                  {Object.values(MODULE_DEFINITIONS).map((mod) => {
+                    const ModIcon = mod.icon
+                    const isSelected = activeModule === mod.key
+                    return (
+                      <button
+                        key={mod.key}
+                        type="button"
+                        onClick={() => {
+                          setActiveModule(mod.key)
+                          setIsHeaderModuleOpen(false)
+                        }}
+                        className={`w-full flex items-start gap-2.5 p-2 rounded-lg text-left transition ${
+                          isSelected
+                            ? 'bg-[#eff6ff] border border-[#bfdbfe]'
+                            : 'hover:bg-[#f8fafc]'
+                        }`}
+                      >
+                        <div
+                          className="size-6 rounded-md flex items-center justify-center shrink-0 mt-0.5"
+                          style={{ backgroundColor: `${mod.color}20`, color: mod.color }}
+                        >
+                          <ModIcon className="size-3.5" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between">
+                            <span className={`text-[11.5px] font-bold ${isSelected ? 'text-[#1d4ed8]' : 'text-[#1e293b]'}`}>
+                              {mod.name}
+                            </span>
+                            <span className="text-[8px] font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-700">
+                              {mod.badge}
+                            </span>
+                          </div>
+                          <p className="text-[10px] text-[#64748b] line-clamp-1 mt-0.5">
+                            {mod.description}
+                          </p>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </>
+            )}
           </div>
         </div>
 

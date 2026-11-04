@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react'
-import Link from 'next/link'
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   Building,
   Check,
@@ -38,7 +38,7 @@ import {
   Users,
   ZoomIn,
   ZoomOut,
-} from 'lucide-react'
+} from "lucide-react";
 import {
   DAGITIM_YERLERI,
   HAZIR_PERSONELLER,
@@ -47,79 +47,108 @@ import {
   RotaTanimi,
   STANDART_DOSYA_PLANLARI,
   VARSAYILAN_ROTALAR,
-} from '@/lib/rota-yonetimi-data'
+} from "@/lib/rota-yonetimi-data";
 import {
   getKurumVeRotaAyarlari,
   saveKurumVeRotaAyarlari,
   useKurumVeRotaAyarlari,
-} from '@/lib/settings/kurum-ve-rota-ayarlari'
-import { RotaYonetimiTable } from './rota-yonetimi-table'
-import { ResmiBelgeFormView } from './resmi-belge-form-view'
-import { ResmiUstYaziTemplate } from '@/lib/document-engine/template'
-import { ResmiUstYaziData } from '@/lib/document-engine/definition'
-import { usePrintHub } from '@/lib/print-hub-context'
-import { UniversalDocumentModal } from '@/components/document-preview/universal-document-modal'
+} from "@/lib/settings/kurum-ve-rota-ayarlari";
+import { RotaYonetimiTable } from "./rota-yonetimi-table";
+import { ResmiBelgeFormView } from "./resmi-belge-form-view";
+import { ResmiUstYaziTemplate } from "@/lib/document-engine/template";
+import { ResmiUstYaziData } from "@/lib/document-engine/definition";
+import { usePrintHub } from "@/lib/print-hub-context";
+import { UniversalDocumentModal } from "@/components/document-preview/universal-document-modal";
 
 export function RotaYonetimiShell() {
-  const { addToPrintQueue } = usePrintHub()
-  const globalSettings = useKurumVeRotaAyarlari()
+  const { addToPrintQueue } = usePrintHub();
+  const globalSettings = useKurumVeRotaAyarlari();
 
   // Sekmeler: Canlı Önizleme & Rota Masası, Rota Tanımları Listesi, Ayarlar
-  const [activeTab, setActiveTab] = useState<'onizleme-akis' | 'rota-tanimlari' | 'ayarlar'>('onizleme-akis')
+  const [activeTab, setActiveTab] = useState<
+    "onizleme-akis" | "rota-tanimlari" | "ayarlar"
+  >("onizleme-akis");
 
   // Seçili / Aktif Rota
-  const [rotalar, setRotalar] = useState<RotaTanimi[]>(VARSAYILAN_ROTALAR)
-  const [selectedRotaId, setSelectedRotaId] = useState<string>(globalSettings.aktifRotaId || 'rota-1')
-  const activeRota = rotalar.find((r) => r.id === selectedRotaId) || rotalar[0]
+  const [rotalar, setRotalar] = useState<RotaTanimi[]>(VARSAYILAN_ROTALAR);
+  const [selectedRotaId, setSelectedRotaId] = useState<string>(
+    globalSettings.aktifRotaId || "rota-1",
+  );
+  const activeRota = rotalar.find((r) => r.id === selectedRotaId) || rotalar[0];
 
   // Belge ve Üst Veri State'leri
-  const [dosyaPlani, setDosyaPlani] = useState<string>('841.01.01')
-  const [sayiNo, setSayiNo] = useState<string>('E-84125801-841.01.01-2026/DT-001')
-  const [tarih, setTarih] = useState<string>(new Date().toLocaleDateString('tr-TR'))
-  const [konu, setKonu] = useState<string>('Doğrudan Temin Alımı Harcama Talimatı ve Piyasa Araştırma Onayı')
-  const [muhatap, setMuhatap] = useState<string>('HARCAMA YETKİLİSİ MAKAMINA')
-  const [muhatapYer, setMuhatapYer] = useState<string>('ANKARA')
+  const [dosyaPlani, setDosyaPlani] = useState<string>("841.01.01");
+  const [sayiNo, setSayiNo] = useState<string>(
+    "E-84125801-841.01.01-2026/DT-001",
+  );
+  const [tarih, setTarih] = useState<string>(
+    new Date().toLocaleDateString("tr-TR"),
+  );
+  const [konu, setKonu] = useState<string>(
+    "Doğrudan Temin Alımı Harcama Talimatı ve Piyasa Araştırma Onayı",
+  );
+  const [muhatap, setMuhatap] = useState<string>("HARCAMA YETKİLİSİ MAKAMINA");
+  const [muhatapYer, setMuhatapYer] = useState<string>("ANKARA");
   const [metin, setMetin] = useState<string>(
-    `Başkanlığımız merkez birimlerinin acil sarf ve toner ihtiyacının karşılanması amacıyla 4734 Sayılı Kamu İhale Kanununun 22/d maddesi kapsamında doğrudan temin usulü ile satın alma işlemi yapılması planlanmaktadır.\n\nSöz konusu alım için piyasa fiyat araştırmasının yapılması, yaklaşık maliyetin belirlenmesi ve görevlendirilen komisyonca işlemlerin ikmal edilmesi hususunu olurlarınıza arz ederim.`
-  )
-  const [ilgi, setIlgi] = useState<string>('Destek Hizmetleri Dairesi Başkanlığının 01.03.2026 tarihli ve 1042 sayılı ihtiyaç yazısı.')
+    `Başkanlığımız merkez birimlerinin acil sarf ve toner ihtiyacının karşılanması amacıyla 4734 Sayılı Kamu İhale Kanununun 22/d maddesi kapsamında doğrudan temin usulü ile satın alma işlemi yapılması planlanmaktadır.\n\nSöz konusu alım için piyasa fiyat araştırmasının yapılması, yaklaşık maliyetin belirlenmesi ve görevlendirilen komisyonca işlemlerin ikmal edilmesi hususunu olurlarınıza arz ederim.`,
+  );
+  const [ilgi, setIlgi] = useState<string>(
+    "Destek Hizmetleri Dairesi Başkanlığının 01.03.2026 tarihli ve 1042 sayılı ihtiyaç yazısı.",
+  );
 
   // Gizlilik & İvedilik
-  const [gizlilik, setGizlilik] = useState<string>('NORMAL')
-  const [ivedilik, setIvedilik] = useState<string>('NORMAL')
+  const [gizlilik, setGizlilik] = useState<string>("NORMAL");
+  const [ivedilik, setIvedilik] = useState<string>("NORMAL");
 
   // Kurum & Antet & İmza Ayarları (Global Ayarlarla senkron)
-  const [kurumAdi, setKurumAdi] = useState<string>(globalSettings.kurumAdi)
-  const [birimAdi, setBirimAdi] = useState<string>(globalSettings.daireBaskanligi)
-  const [altBirimAdi, setAltBirimAdi] = useState<string>(globalSettings.subeMudurlugu)
-  const [harcamaYetkilisiAdi, setHarcamaYetkilisiAdi] = useState<string>(globalSettings.harcamaYetkilisiAdi)
-  const [harcamaYetkilisiUnvan, setHarcamaYetkilisiUnvan] = useState<string>(globalSettings.harcamaYetkilisiUnvan)
-  const [gerceklestirmeGorevlisiAdi, setGerceklestirmeGorevlisiAdi] = useState<string>(globalSettings.gerceklestirmeGorevlisiAdi)
-  const [gerceklestirmeGorevlisiUnvan, setGerceklestirmeGorevlisiUnvan] = useState<string>(globalSettings.gerceklestirmeGorevlisiUnvan)
-  const [ebysEvrakFormat, setEbysEvrakFormat] = useState<string>(globalSettings.ebysEvrakFormat)
-  const [karekodGoster, setKarekodGoster] = useState<boolean>(globalSettings.karekodGoster)
-  const [dogrulamaKodu, setDogrulamaKodu] = useState<string>(globalSettings.dogrulamaKodu)
+  const [kurumAdi, setKurumAdi] = useState<string>(globalSettings.kurumAdi);
+  const [birimAdi, setBirimAdi] = useState<string>(
+    globalSettings.daireBaskanligi,
+  );
+  const [altBirimAdi, setAltBirimAdi] = useState<string>(
+    globalSettings.subeMudurlugu,
+  );
+  const [harcamaYetkilisiAdi, setHarcamaYetkilisiAdi] = useState<string>(
+    globalSettings.harcamaYetkilisiAdi,
+  );
+  const [harcamaYetkilisiUnvan, setHarcamaYetkilisiUnvan] = useState<string>(
+    globalSettings.harcamaYetkilisiUnvan,
+  );
+  const [gerceklestirmeGorevlisiAdi, setGerceklestirmeGorevlisiAdi] = useState<
+    string
+  >(globalSettings.gerceklestirmeGorevlisiAdi);
+  const [gerceklestirmeGorevlisiUnvan, setGerceklestirmeGorevlisiUnvan] =
+    useState<string>(globalSettings.gerceklestirmeGorevlisiUnvan);
+  const [ebysEvrakFormat, setEbysEvrakFormat] = useState<string>(
+    globalSettings.ebysEvrakFormat,
+  );
+  const [karekodGoster, setKarekodGoster] = useState<boolean>(
+    globalSettings.karekodGoster,
+  );
+  const [dogrulamaKodu, setDogrulamaKodu] = useState<string>(
+    globalSettings.dogrulamaKodu,
+  );
 
   // Önizleme Zoom & Ekran Modu
-  const [zoomLevel, setZoomLevel] = useState<number>(85) // %
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
-  const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const [zoomLevel, setZoomLevel] = useState<number>(85); // %
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Global ayarlar değiştiğinde yerel inputları güncelle
   useEffect(() => {
-    const s = getKurumVeRotaAyarlari()
-    setKurumAdi(s.kurumAdi)
-    setBirimAdi(s.daireBaskanligi)
-    setAltBirimAdi(s.subeMudurlugu)
-    setHarcamaYetkilisiAdi(s.harcamaYetkilisiAdi)
-    setHarcamaYetkilisiUnvan(s.harcamaYetkilisiUnvan)
-    setGerceklestirmeGorevlisiAdi(s.gerceklestirmeGorevlisiAdi)
-    setGerceklestirmeGorevlisiUnvan(s.gerceklestirmeGorevlisiUnvan)
-    setKarekodGoster(s.karekodGoster)
-    setDogrulamaKodu(s.dogrulamaKodu)
-    setEbysEvrakFormat(s.ebysEvrakFormat)
-    if (s.aktifRotaId) setSelectedRotaId(s.aktifRotaId)
-  }, [])
+    const s = getKurumVeRotaAyarlari();
+    setKurumAdi(s.kurumAdi);
+    setBirimAdi(s.daireBaskanligi);
+    setAltBirimAdi(s.subeMudurlugu);
+    setHarcamaYetkilisiAdi(s.harcamaYetkilisiAdi);
+    setHarcamaYetkilisiUnvan(s.harcamaYetkilisiUnvan);
+    setGerceklestirmeGorevlisiAdi(s.gerceklestirmeGorevlisiAdi);
+    setGerceklestirmeGorevlisiUnvan(s.gerceklestirmeGorevlisiUnvan);
+    setKarekodGoster(s.karekodGoster);
+    setDogrulamaKodu(s.dogrulamaKodu);
+    setEbysEvrakFormat(s.ebysEvrakFormat);
+    if (s.aktifRotaId) setSelectedRotaId(s.aktifRotaId);
+  }, []);
 
   const handleSaveAyarlar = () => {
     saveKurumVeRotaAyarlari({
@@ -134,17 +163,21 @@ export function RotaYonetimiShell() {
       karekodGoster,
       ebysEvrakFormat,
       aktifRotaId: selectedRotaId,
-    })
-    setToastMessage('EBYS, antet ve yetkili imza ayarları başarıyla tüm belgelere uygulandı ve kaydedildi!')
-    setTimeout(() => setToastMessage(null), 3500)
-  }
+    });
+    setToastMessage(
+      "EBYS, antet ve yetkili imza ayarları başarıyla tüm belgelere uygulandı ve kaydedildi!",
+    );
+    setTimeout(() => setToastMessage(null), 3500);
+  };
 
-  const mapImzaTuru = (tur: string): 'Hazırlayan' | 'Paraf' | 'İmza' | 'Bilgi' | 'Onay' => {
-    if (tur.includes('İmza')) return 'İmza'
-    if (tur.includes('Paraf')) return 'Paraf'
-    if (tur.includes('Arz') || tur.includes('Teklif')) return 'Hazırlayan'
-    return 'Paraf'
-  }
+  const mapImzaTuru = (
+    tur: string,
+  ): "Hazırlayan" | "Paraf" | "İmza" | "Bilgi" | "Onay" => {
+    if (tur.includes("İmza")) return "İmza";
+    if (tur.includes("Paraf")) return "Paraf";
+    if (tur.includes("Arz") || tur.includes("Teklif")) return "Hazırlayan";
+    return "Paraf";
+  };
 
   // Canlı Belge Verisi Sentezi (ResmiUstYaziData standardı)
   const previewDocumentData: ResmiUstYaziData = {
@@ -158,15 +191,21 @@ export function RotaYonetimiShell() {
     kurumAdi,
     birimAdi,
     altBirimAdi,
-    tcIbaresi: 'T.C.',
+    tcIbaresi: "T.C.",
     gizlilikDerecesi: gizlilik as any,
     ivedilikDerecesi: ivedilik as any,
-    ekler: ['1- Piyasa Fiyat Araştırma Tutanağı (1 Sayfa)', '2- Yaklaşık Maliyet Cetveli (1 Sayfa)'],
-    dagitim: ['Gereği: Harcama Yetkilisi Makamı', 'Bilgi: Mali Hizmetler Dairesi'],
+    ekler: [
+      "1- Piyasa Fiyat Araştırma Tutanağı (1 Sayfa)",
+      "2- Yaklaşık Maliyet Cetveli (1 Sayfa)",
+    ],
+    dagitim: [
+      "Gereği: Harcama Yetkilisi Makamı",
+      "Bilgi: Mali Hizmetler Dairesi",
+    ],
     ebysDogrulama: {
       dogrulamaKodu,
-      dogrulamaUrl: 'https://ebys.belediye.gov.tr/dogrula',
-      evrakId: '2026-00412',
+      dogrulamaUrl: "https://ebys.belediye.gov.tr/dogrula",
+      evrakId: "2026-00412",
       karekodVarMi: karekodGoster,
     },
     rota: activeRota.adimlari.map((a, idx) => ({
@@ -174,24 +213,24 @@ export function RotaYonetimiShell() {
       tur: mapImzaTuru(a.imzaTuru),
       adSoyad: a.adSoyad,
       unvan: a.unvan,
-      durum: idx === 0 ? 'ONAYLANDI' : 'BEKLIYOR',
+      durum: idx === 0 ? "ONAYLANDI" : "BEKLIYOR",
       islemTarihi: idx === 0 ? new Date().toISOString() : undefined,
     })),
-  }
+  };
 
   const handleKuyrugaGonder = () => {
     addToPrintQueue({
       title: `EBYS Resmî Yazı - ${konu}`,
-      docNo: 'DOC_RESMI_UST_YAZI',
-      dosyaNo: 'EBYS-2026/01',
+      docNo: "DOC_RESMI_UST_YAZI",
+      dosyaNo: "EBYS-2026/01",
       dosyaAdi: konu,
-      category: 'EBYS Resmî Yazı',
-      format: 'A4 Dikey',
+      category: "EBYS Resmî Yazı",
+      format: "A4 Dikey",
       pageCount: 1,
-    })
-    setToastMessage(`"${konu}" EBYS Resmî Yazısı Yazdırma Merkezine eklendi!`)
-    setTimeout(() => setToastMessage(null), 3500)
-  }
+    });
+    setToastMessage(`"${konu}" EBYS Resmî Yazısı Yazdırma Merkezine eklendi!`);
+    setTimeout(() => setToastMessage(null), 3500);
+  };
 
   return (
     <div className="space-y-3 pb-8">
@@ -210,11 +249,16 @@ export function RotaYonetimiShell() {
             ⌂ Kamu 360
           </Link>
           <span className="text-[#adb5bd]">/</span>
-          <Link href="/malzeme-bilgisi" className="font-semibold text-[#172334] hover:text-[#0c67dc]">
+          <Link
+            href="/malzeme-bilgisi"
+            className="font-semibold text-[#172334] hover:text-[#0c67dc]"
+          >
             Satın Alma Yönetimi
           </Link>
           <span className="text-[#adb5bd]">/</span>
-          <span className="font-semibold text-[#2d62d7]">Rota İşlemleri ve İş Akışları (EBYS)</span>
+          <span className="font-semibold text-[#2d62d7]">
+            Rota İşlemleri ve İş Akışları (EBYS)
+          </span>
         </div>
 
         {/* Sağ Üst Aksiyonlar */}
@@ -255,11 +299,11 @@ export function RotaYonetimiShell() {
           <div className="flex items-center">
             <button
               type="button"
-              onClick={() => setActiveTab('onizleme-akis')}
+              onClick={() => setActiveTab("onizleme-akis")}
               className={`flex items-center gap-1.5 border-b-2 px-4 py-2 font-bold transition ${
-                activeTab === 'onizleme-akis'
-                  ? 'border-[#2d62d7] text-[#2d62d7] bg-white rounded-t'
-                  : 'border-transparent text-[#64748b] hover:text-[#1e293b]'
+                activeTab === "onizleme-akis"
+                  ? "border-[#2d62d7] text-[#2d62d7] bg-white rounded-t"
+                  : "border-transparent text-[#64748b] hover:text-[#1e293b]"
               }`}
             >
               <FileSignature className="size-3.5" />
@@ -268,11 +312,11 @@ export function RotaYonetimiShell() {
 
             <button
               type="button"
-              onClick={() => setActiveTab('rota-tanimlari')}
+              onClick={() => setActiveTab("rota-tanimlari")}
               className={`flex items-center gap-1.5 border-b-2 px-4 py-2 font-bold transition ${
-                activeTab === 'rota-tanimlari'
-                  ? 'border-[#2d62d7] text-[#2d62d7] bg-white rounded-t'
-                  : 'border-transparent text-[#64748b] hover:text-[#1e293b]'
+                activeTab === "rota-tanimlari"
+                  ? "border-[#2d62d7] text-[#2d62d7] bg-white rounded-t"
+                  : "border-transparent text-[#64748b] hover:text-[#1e293b]"
               }`}
             >
               <GitBranch className="size-3.5" />
@@ -284,11 +328,11 @@ export function RotaYonetimiShell() {
 
             <button
               type="button"
-              onClick={() => setActiveTab('ayarlar')}
+              onClick={() => setActiveTab("ayarlar")}
               className={`flex items-center gap-1.5 border-b-2 px-4 py-2 font-bold transition ${
-                activeTab === 'ayarlar'
-                  ? 'border-[#2d62d7] text-[#2d62d7] bg-white rounded-t'
-                  : 'border-transparent text-[#64748b] hover:text-[#1e293b]'
+                activeTab === "ayarlar"
+                  ? "border-[#2d62d7] text-[#2d62d7] bg-white rounded-t"
+                  : "border-transparent text-[#64748b] hover:text-[#1e293b]"
               }`}
             >
               <Sliders className="size-3.5" />
@@ -298,12 +342,14 @@ export function RotaYonetimiShell() {
 
           <div className="hidden md:flex items-center gap-2 pr-3 text-[11px] font-medium text-[#5b6877]">
             <span className="inline-block size-2 rounded-full bg-emerald-500" />
-            <span>31151 Sayılı Yönetmelik &amp; 5070 Sayılı e-İmza Motoru Aktif</span>
+            <span>
+              31151 Sayılı Yönetmelik &amp; 5070 Sayılı e-İmza Motoru Aktif
+            </span>
           </div>
         </div>
 
         {/* ===================== SEKME 1: CANLI BELGE ÖNİZLEME & AKIŞ GİRİŞİ (SPLIT VIEW) ===================== */}
-        {activeTab === 'onizleme-akis' && (
+        {activeTab === "onizleme-akis" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-[#eef0f3]">
             {/* SOL KOLON: EVRAK GİRİŞ VE ROTA PARAMETRELERİ (5 Kolon) */}
             <div className="lg:col-span-5 p-3.5 space-y-3.5 bg-white text-[11px] overflow-y-auto max-h-[820px]">
@@ -335,14 +381,18 @@ export function RotaYonetimiShell() {
                         <span className="flex size-4 items-center justify-center rounded bg-[#e4e6ea] font-mono text-[9px] font-bold text-[#4f5b69]">
                           {a.sira}
                         </span>
-                        <span className="font-semibold text-[#172334] truncate">{a.adSoyad}</span>
-                        <span className="text-[#7b8794] truncate hidden sm:inline">• {a.unvan}</span>
+                        <span className="font-semibold text-[#172334] truncate">
+                          {a.adSoyad}
+                        </span>
+                        <span className="text-[#7b8794] truncate hidden sm:inline">
+                          • {a.unvan}
+                        </span>
                       </div>
                       <span
                         className={`rounded px-1.5 py-0.2 font-semibold text-[9.5px] ${
-                          a.imzaTuru.includes('İmza')
-                            ? 'bg-[#dcefd9] text-[#2f6a2f]'
-                            : 'bg-[#d3e0fb] text-[#2d62d7]'
+                          a.imzaTuru.includes("İmza")
+                            ? "bg-[#dcefd9] text-[#2f6a2f]"
+                            : "bg-[#d3e0fb] text-[#2d62d7]"
                         }`}
                       >
                         {a.imzaTuru}
@@ -462,7 +512,9 @@ export function RotaYonetimiShell() {
                 {/* Gizlilik & İvedilik Seçimi */}
                 <div className="grid grid-cols-2 gap-2 pt-1">
                   <div>
-                    <label className="block text-[10px] font-medium text-[#5b6877]">Gizlilik</label>
+                    <label className="block text-[10px] font-medium text-[#5b6877]">
+                      Gizlilik
+                    </label>
                     <select
                       value={gizlilik}
                       onChange={(e) => setGizlilik(e.target.value)}
@@ -475,7 +527,9 @@ export function RotaYonetimiShell() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[10px] font-medium text-[#5b6877]">İvedilik</label>
+                    <label className="block text-[10px] font-medium text-[#5b6877]">
+                      İvedilik
+                    </label>
                     <select
                       value={ivedilik}
                       onChange={(e) => setIvedilik(e.target.value)}
@@ -495,7 +549,9 @@ export function RotaYonetimiShell() {
               {/* Önizleme Araç Çubuğu */}
               <div className="mb-3 flex w-full max-w-[210mm] items-center justify-between rounded border border-[#d9dee5] bg-white px-3 py-1.5 text-[11px] shadow-xs">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-[#172334]">Canlı A4 Sayfa Önizleme</span>
+                  <span className="font-semibold text-[#172334]">
+                    Canlı A4 Sayfa Önizleme
+                  </span>
                   <span className="rounded bg-[#d3e0fb] px-1.5 py-0.2 text-[9.5px] font-bold text-[#2d62d7]">
                     31151 Standardı
                   </span>
@@ -504,16 +560,20 @@ export function RotaYonetimiShell() {
                 <div className="flex items-center gap-1.5">
                   <button
                     type="button"
-                    onClick={() => setZoomLevel((prev) => Math.max(60, prev - 10))}
+                    onClick={() =>
+                      setZoomLevel((prev) => Math.max(60, prev - 10))}
                     className="flex size-6 items-center justify-center rounded border border-[#d9dee5] text-[#5b6877] hover:bg-[#f5f6f8]"
                     title="Küçült"
                   >
                     <ZoomOut className="size-3" />
                   </button>
-                  <span className="font-mono text-[10px] text-[#5b6877] w-8 text-center">{zoomLevel}%</span>
+                  <span className="font-mono text-[10px] text-[#5b6877] w-8 text-center">
+                    {zoomLevel}%
+                  </span>
                   <button
                     type="button"
-                    onClick={() => setZoomLevel((prev) => Math.min(130, prev + 10))}
+                    onClick={() =>
+                      setZoomLevel((prev) => Math.min(130, prev + 10))}
                     className="flex size-6 items-center justify-center rounded border border-[#d9dee5] text-[#5b6877] hover:bg-[#f5f6f8]"
                     title="Büyüt"
                   >
@@ -549,7 +609,7 @@ export function RotaYonetimiShell() {
                 className="transition-all duration-200 origin-top overflow-auto shadow-xl"
                 style={{
                   transform: `scale(${zoomLevel / 100})`,
-                  transformOrigin: 'top center',
+                  transformOrigin: "top center",
                   marginBottom: `${(1 - zoomLevel / 100) * -200}px`,
                 }}
               >
@@ -560,21 +620,22 @@ export function RotaYonetimiShell() {
         )}
 
         {/* ===================== SEKME 2: ROTA TANIMLARI & ŞABLONLAR ===================== */}
-        {activeTab === 'rota-tanimlari' && (
+        {activeTab === "rota-tanimlari" && (
           <div className="p-4">
             <RotaYonetimiTable />
           </div>
         )}
 
         {/* ===================== SEKME 3: EBYS & BELGE PARAMETRE AYARLARI ===================== */}
-        {activeTab === 'ayarlar' && (
+        {activeTab === "ayarlar" && (
           <div className="p-5 max-w-4xl space-y-4 text-[11px]">
             <div className="border-b border-[#eef0f3] pb-2">
               <h4 className="text-[13px] font-bold text-[#172334]">
                 EBYS Antet, Karekod ve Rota Parametreleri
               </h4>
               <p className="text-[10.5px] text-[#7b8794]">
-                Bu ayarlar resmî üst yazılarda, onay belgelerinde ve paraf rotası çıktılarında otomatik uygulanır.
+                Bu ayarlar resmî üst yazılarda, onay belgelerinde ve paraf
+                rotası çıktılarında otomatik uygulanır.
               </p>
             </div>
 
@@ -587,7 +648,9 @@ export function RotaYonetimiShell() {
                 </h5>
 
                 <div>
-                  <label className="text-[#5b6877]">Kurum / Belediye Adı (T.C.)</label>
+                  <label className="text-[#5b6877]">
+                    Kurum / Belediye Adı (T.C.)
+                  </label>
                   <input
                     type="text"
                     value={kurumAdi}
@@ -597,7 +660,9 @@ export function RotaYonetimiShell() {
                 </div>
 
                 <div>
-                  <label className="text-[#5b6877]">Daire Başkanlığı / Ana Birim</label>
+                  <label className="text-[#5b6877]">
+                    Daire Başkanlığı / Ana Birim
+                  </label>
                   <input
                     type="text"
                     value={birimAdi}
@@ -607,7 +672,9 @@ export function RotaYonetimiShell() {
                 </div>
 
                 <div>
-                  <label className="text-[#5b6877]">Şube Müdürlüğü / Alt Birim</label>
+                  <label className="text-[#5b6877]">
+                    Şube Müdürlüğü / Alt Birim
+                  </label>
                   <input
                     type="text"
                     value={altBirimAdi}
@@ -625,7 +692,9 @@ export function RotaYonetimiShell() {
                 </h5>
 
                 <div>
-                  <label className="text-[#5b6877]">Harcama Yetkilisi Adı Soyadı</label>
+                  <label className="text-[#5b6877]">
+                    Harcama Yetkilisi Adı Soyadı
+                  </label>
                   <input
                     type="text"
                     value={harcamaYetkilisiAdi}
@@ -635,7 +704,9 @@ export function RotaYonetimiShell() {
                 </div>
 
                 <div>
-                  <label className="text-[#5b6877]">Harcama Yetkilisi Unvanı</label>
+                  <label className="text-[#5b6877]">
+                    Harcama Yetkilisi Unvanı
+                  </label>
                   <input
                     type="text"
                     value={harcamaYetkilisiUnvan}
@@ -645,21 +716,27 @@ export function RotaYonetimiShell() {
                 </div>
 
                 <div>
-                  <label className="text-[#5b6877]">Gerçekleştirme Görevlisi Adı Soyadı</label>
+                  <label className="text-[#5b6877]">
+                    Gerçekleştirme Görevlisi Adı Soyadı
+                  </label>
                   <input
                     type="text"
                     value={gerceklestirmeGorevlisiAdi}
-                    onChange={(e) => setGerceklestirmeGorevlisiAdi(e.target.value)}
+                    onChange={(e) =>
+                      setGerceklestirmeGorevlisiAdi(e.target.value)}
                     className="mt-0.5 h-7 w-full rounded border border-[#d9dee5] px-2 font-bold text-[#172334] outline-none focus:border-[#2d62d7]"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[#5b6877]">Gerçekleştirme Görevlisi Unvanı</label>
+                  <label className="text-[#5b6877]">
+                    Gerçekleştirme Görevlisi Unvanı
+                  </label>
                   <input
                     type="text"
                     value={gerceklestirmeGorevlisiUnvan}
-                    onChange={(e) => setGerceklestirmeGorevlisiUnvan(e.target.value)}
+                    onChange={(e) =>
+                      setGerceklestirmeGorevlisiUnvan(e.target.value)}
                     className="mt-0.5 h-7 w-full rounded border border-[#d9dee5] px-2 outline-none focus:border-[#2d62d7]"
                   />
                 </div>
@@ -673,20 +750,30 @@ export function RotaYonetimiShell() {
                 </h5>
 
                 <div>
-                  <label className="text-[#5b6877]">Yazışma Yönetmeliği Formatı</label>
+                  <label className="text-[#5b6877]">
+                    Yazışma Yönetmeliği Formatı
+                  </label>
                   <select
                     value={ebysEvrakFormat}
                     onChange={(e) => setEbysEvrakFormat(e.target.value)}
                     className="mt-0.5 h-7 w-full rounded border border-[#d9dee5] bg-white px-2 outline-none focus:border-[#2d62d7]"
                   >
-                    <option value="STANDART_31151">31151 Sayılı Resmî Yazışma Yönetmeliği (A4 Dikey)</option>
-                    <option value="KAMU_IHALE_22D">4734 Sayılı Kanun 22/d Doğrudan Temin Formatı</option>
-                    <option value="BELEDIYE_IC_YAZISMA">Belediye İçi Birimler Arası Müzekkere Formatı</option>
+                    <option value="STANDART_31151">
+                      31151 Sayılı Resmî Yazışma Yönetmeliği (A4 Dikey)
+                    </option>
+                    <option value="KAMU_IHALE_22D">
+                      4734 Sayılı Kanun 22/d Doğrudan Temin Formatı
+                    </option>
+                    <option value="BELEDIYE_IC_YAZISMA">
+                      Belediye İçi Birimler Arası Müzekkere Formatı
+                    </option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="text-[#5b6877]">Evrak Doğrulama Kodu / Barkod Formatı</label>
+                  <label className="text-[#5b6877]">
+                    Evrak Doğrulama Kodu / Barkod Formatı
+                  </label>
                   <input
                     type="text"
                     value={dogrulamaKodu}
@@ -703,7 +790,10 @@ export function RotaYonetimiShell() {
                       onChange={(e) => setKarekodGoster(e.target.checked)}
                       className="size-3.5 accent-[#2d62d7] rounded-sm"
                     />
-                    <span>Belge Altında e-İmza Karekodu ve Doğrulama Bağlantısı Gösterilsin</span>
+                    <span>
+                      Belge Altında e-İmza Karekodu ve Doğrulama Bağlantısı
+                      Gösterilsin
+                    </span>
                   </label>
                 </div>
               </div>
@@ -716,7 +806,9 @@ export function RotaYonetimiShell() {
                 </h5>
 
                 <div>
-                  <label className="text-[#5b6877]">Otomatik Bağlanacak Onay Rotası</label>
+                  <label className="text-[#5b6877]">
+                    Otomatik Bağlanacak Onay Rotası
+                  </label>
                   <select
                     value={selectedRotaId}
                     onChange={(e) => setSelectedRotaId(e.target.value)}
@@ -736,7 +828,10 @@ export function RotaYonetimiShell() {
                     <span>Canlı Şablon Entegrasyonu Aktif</span>
                   </div>
                   <p>
-                    Buradaki antet ve imza yetkilileri Onay Belgesi, Piyasa Fiyat Araştırma Tutanağı, Yaklaşık Maliyet Cetveli, Doğrudan Temin Sözleşmesi, Muayene Kabul ve EBYS Resmî Yazısına eş zamanlı olarak yansıtılmaktadır.
+                    Buradaki antet ve imza yetkilileri Onay Belgesi, Piyasa
+                    Fiyat Araştırma Tutanağı, Yaklaşık Maliyet Cetveli, Doğrudan
+                    Temin Sözleşmesi, Muayene Kabul ve EBYS Resmî Yazısına eş
+                    zamanlı olarak yansıtılmaktadır.
                   </p>
                 </div>
               </div>
@@ -763,20 +858,20 @@ export function RotaYonetimiShell() {
           onClose={() => setIsModalOpen(false)}
           jobs={[
             {
-              id: 'ebys-preview-1',
+              id: "ebys-preview-1",
               title: `EBYS Resmî Yazı - ${konu}`,
-              docNo: 'DOC_RESMI_UST_YAZI',
-              dosyaNo: 'EBYS-2026/01',
+              docNo: "DOC_RESMI_UST_YAZI",
+              dosyaNo: "EBYS-2026/01",
               dosyaAdi: konu,
-              category: 'EBYS Resmî Yazı',
-              format: 'A4 Dikey',
+              category: "EBYS Resmî Yazı",
+              format: "A4 Dikey",
               pageCount: 1,
-              addedAt: 'Canlı',
-              status: 'Hazır',
+              addedAt: "Canlı",
+              status: "Hazır",
             },
           ]}
         />
       )}
     </div>
-  )
+  );
 }
