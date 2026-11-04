@@ -976,7 +976,7 @@ export function Sidebar({ menuOpen, onCloseMenu }: SidebarProps) {
         </div>
 
         {/* ALT KISIM: KURUM KARTI VE KURUM AYARI */}
-        <div className="p-2.5 border-t border-[#26354a] bg-[#121a27]">
+        <div className="shrink-0 p-2.5 border-t border-[#26354a] bg-[#121a27]">
           {isCollapsed ? (
             <button
               type="button"
