@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense, useCallback } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { BrandLogo } from '@/components/ui/brand-logo'
 import { useModule, MODULE_DEFINITIONS, ModuleKey, ModuleDefinition } from '@/lib/module-context'
 import {
@@ -77,10 +77,25 @@ interface SidebarProps {
   onCloseMenu: () => void
 }
 
+function SearchParamsWatcher({ onParamsChange }: { onParamsChange: (search: string) => void }) {
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    onParamsChange(searchParams ? searchParams.toString() : '')
+  }, [searchParams, onParamsChange])
+
+  return null
+}
+
 export function Sidebar({ menuOpen, onCloseMenu }: SidebarProps) {
   const pathname = usePathname()
   const { activeModule, setActiveModule, currentModule } = useModule()
+  const [currentSearch, setCurrentSearch] = useState('')
   const [isCollapsed, setIsCollapsed] = useState(false)
+
+  const handleParamsChange = useCallback((params: string) => {
+    setCurrentSearch(params)
+  }, [])
   const [isKurumModalOpen, setIsKurumModalOpen] = useState(false)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const [isModuleDropdownOpen, setIsModuleDropdownOpen] = useState(false)
@@ -211,12 +226,20 @@ export function Sidebar({ menuOpen, onCloseMenu }: SidebarProps) {
     }
     if (href.includes('?')) {
       const [base, query] = href.split('?')
-      if (typeof window !== 'undefined') {
-        return pathname === base && window.location.search.includes(query)
+      if (pathname !== base) {
+        return false
       }
-      return pathname === base
+      if (currentSearch) {
+        return currentSearch.includes(query)
+      }
+      // Varsayılan sekmeler (URL'de henüz query parametresi yoksa)
+      if (base === '/harita-altyapi') return query === 'tab=harita'
+      if (base === '/personel-takibi') return query === 'tab=ozluk'
+      if (base === '/bkmybs-mali-yonetim') return query === 'tab=butce'
+      if (base === '/gelir-ihaleleri/dosya-tanimi') return query === 'view=liste'
+      return false
     }
-    if (typeof window !== 'undefined' && window.location.search.includes('tab=')) {
+    if (currentSearch && currentSearch.includes('tab=')) {
       return false
     }
     return pathname === href
@@ -554,6 +577,11 @@ export function Sidebar({ menuOpen, onCloseMenu }: SidebarProps) {
 
   return (
     <>
+      {/* Search Params Dinleyici (SSR Hydration Güvenli) */}
+      <Suspense fallback={null}>
+        <SearchParamsWatcher onParamsChange={handleParamsChange} />
+      </Suspense>
+
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 bg-emerald-600 text-white rounded-xl shadow-2xl text-xs font-semibold animate-in fade-in slide-in-from-bottom-2">
