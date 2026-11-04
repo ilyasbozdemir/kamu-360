@@ -49,12 +49,16 @@ import {
   ShieldCheck,
   Sparkles,
   Star,
+  Sun,
+  Moon,
+  Monitor,
   Tag,
   Trash2,
   User,
   UserCheck,
   X,
 } from "lucide-react";
+import { useTheme } from "@/lib/theme-context";
 
 interface HeaderProps {
   menuOpen: boolean;
@@ -68,11 +72,13 @@ type ActiveDropdown =
   | "info"
   | "profile"
   | "search"
+  | "theme"
   | null;
 
 export function Header({ menuOpen, onToggleMenu }: HeaderProps) {
   const pathname = usePathname();
   const { activeModule, setActiveModule, currentModule } = useModule();
+  const { theme, resolvedTheme, setTheme, toggleTheme } = useTheme();
   const [isHeaderModuleOpen, setIsHeaderModuleOpen] = useState(false);
   const { printQueue, removeFromPrintQueue, clearPrintQueue, batchPrint } =
     usePrintHub();
@@ -416,11 +422,11 @@ export function Header({ menuOpen, onToggleMenu }: HeaderProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex h-[58px] items-center border-b border-[#dfe3e9] bg-white px-4 shadow-[0_1px_3px_rgba(0,0,0,.04)] select-none">
+      <header className="sticky top-0 z-30 flex h-[58px] items-center border-b border-[#dfe3e9] dark:border-[#26354a] bg-white dark:bg-[#162130] px-4 shadow-[0_1px_3px_rgba(0,0,0,.04)] dark:shadow-none select-none transition-colors duration-200">
         {/* Mobile Hamburger */}
         <button
           type="button"
-          className="mr-3.5 rounded-md p-2 text-[#526174] lg:hidden hover:bg-[#f1f4f9]"
+          className="mr-3.5 rounded-md p-2 text-[#526174] dark:text-[#94a3b8] lg:hidden hover:bg-[#f1f4f9] dark:hover:bg-[#1f2d42]"
           onClick={onToggleMenu}
           aria-label="Menüyü aç"
         >
@@ -437,25 +443,25 @@ export function Header({ menuOpen, onToggleMenu }: HeaderProps) {
             <BrandLogo className="size-8.5 shrink-0 shadow-xs transition-transform group-hover:scale-105" />
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5 leading-none">
-                <span className="text-[17px] font-black tracking-tight text-[#16253b]">
+                <span className="text-[17px] font-black tracking-tight text-[#16253b] dark:text-white">
                   KAMU
                 </span>
                 <span className="rounded bg-[#2d62d7] px-1.5 py-0.5 text-[10px] font-extrabold text-white tracking-wide shadow-2xs">
                   360
                 </span>
               </div>
-              <span className="text-[9px] font-semibold text-[#64748b] tracking-wider uppercase mt-0.5 hidden md:block">
+              <span className="text-[9px] font-semibold text-[#64748b] dark:text-[#94a3b8] tracking-wider uppercase mt-0.5 hidden md:block">
                 İhale &bull; Satın Alma &bull; Gelir
               </span>
             </div>
           </Link>
-          <span className="mx-3 hidden h-4 w-px bg-[#cbd5e1] sm:inline-block" />
+          <span className="mx-3 hidden h-4 w-px bg-[#cbd5e1] dark:bg-[#26354a] sm:inline-block" />
           {/* İNTERAKTİF HEADER MODÜL SEÇİCİ */}
           <div className="relative hidden sm:block">
             <button
               type="button"
               onClick={() => setIsHeaderModuleOpen(!isHeaderModuleOpen)}
-              className="flex items-center gap-2 px-2.5 py-1 rounded-lg border border-[#e2e8f0] bg-[#f8fafc] hover:bg-[#f1f5f9] text-left transition group shadow-2xs"
+              className="flex items-center gap-2 px-2.5 py-1 rounded-lg border border-[#e2e8f0] dark:border-[#26354a] bg-[#f8fafc] dark:bg-[#1a2536] hover:bg-[#f1f5f9] dark:hover:bg-[#202e42] text-left transition group shadow-2xs"
             >
               <div
                 className="size-5 rounded-md flex items-center justify-center shrink-0"
@@ -463,7 +469,7 @@ export function Header({ menuOpen, onToggleMenu }: HeaderProps) {
               >
                 <currentModule.icon className="size-3.5" />
               </div>
-              <span className="text-[12px] font-bold text-[#1e293b]">
+              <span className="text-[12px] font-bold text-[#1e293b] dark:text-slate-100">
                 {currentModule.shortName}
               </span>
               <span
@@ -472,14 +478,14 @@ export function Header({ menuOpen, onToggleMenu }: HeaderProps) {
               >
                 {currentModule.badge}
               </span>
-              <ChevronDown className="size-3 text-[#94a3b8] group-hover:text-[#475569] transition" />
+              <ChevronDown className="size-3 text-[#94a3b8] group-hover:text-[#475569] dark:group-hover:text-slate-300 transition" />
             </button>
 
             {isHeaderModuleOpen && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setIsHeaderModuleOpen(false)} />
-                <div className="absolute left-0 top-full mt-2 w-72 z-50 rounded-xl bg-white p-2 shadow-2xl border border-[#cbd5e1] space-y-1 animate-in fade-in">
-                  <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#94a3b8]">
+                <div className="absolute left-0 top-full mt-2 w-72 z-50 rounded-xl bg-white dark:bg-[#162130] p-2 shadow-2xl border border-[#cbd5e1] dark:border-[#26354a] space-y-1 animate-in fade-in">
+                  <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#94a3b8] dark:text-[#64748b]">
                     ÇALIŞMA ALANI & MODÜL SEÇİMİ
                   </div>
                   {Object.values(MODULE_DEFINITIONS).map((mod) => {
@@ -495,8 +501,8 @@ export function Header({ menuOpen, onToggleMenu }: HeaderProps) {
                         }}
                         className={`w-full flex items-start gap-2.5 p-2 rounded-lg text-left transition ${
                           isSelected
-                            ? 'bg-[#eff6ff] border border-[#bfdbfe]'
-                            : 'hover:bg-[#f8fafc]'
+                            ? 'bg-[#eff6ff] dark:bg-blue-900/30 border border-[#bfdbfe] dark:border-blue-700/50'
+                            : 'hover:bg-[#f8fafc] dark:hover:bg-[#1f2d42]'
                         }`}
                       >
                         <div
@@ -507,14 +513,14 @@ export function Header({ menuOpen, onToggleMenu }: HeaderProps) {
                         </div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between">
-                            <span className={`text-[11.5px] font-bold ${isSelected ? 'text-[#1d4ed8]' : 'text-[#1e293b]'}`}>
+                            <span className={`text-[11.5px] font-bold ${isSelected ? 'text-[#1d4ed8] dark:text-blue-300' : 'text-[#1e293b] dark:text-slate-200'}`}>
                               {mod.name}
                             </span>
-                            <span className="text-[8px] font-bold px-1.5 py-0.2 rounded bg-slate-100 text-slate-700">
+                            <span className="text-[8px] font-bold px-1.5 py-0.2 rounded bg-slate-100 dark:bg-[#202e42] text-slate-700 dark:text-slate-300">
                               {mod.badge}
                             </span>
                           </div>
-                          <p className="text-[10px] text-[#64748b] line-clamp-1 mt-0.5">
+                          <p className="text-[10px] text-[#64748b] dark:text-[#8ea1ba] line-clamp-1 mt-0.5">
                             {mod.description}
                           </p>
                         </div>
@@ -531,13 +537,13 @@ export function Header({ menuOpen, onToggleMenu }: HeaderProps) {
         <button
           type="button"
           onClick={() => setActiveDropdown("search")}
-          className="hidden h-8 w-[275px] items-center justify-between rounded-md border border-[#e4e7ec] bg-[#fafbfc] px-3 text-[11px] text-[#9aa2ad] transition hover:border-[#2d62d7]/50 sm:flex"
+          className="hidden h-8 w-[275px] items-center justify-between rounded-md border border-[#e4e7ec] dark:border-[#26354a] bg-[#fafbfc] dark:bg-[#121a27] px-3 text-[11px] text-[#9aa2ad] dark:text-[#7d8fa5] transition hover:border-[#2d62d7]/50 sm:flex"
         >
           <span className="flex items-center gap-2">
-            <Search className="size-3.5 text-[#526174]" />
+            <Search className="size-3.5 text-[#526174] dark:text-[#7d8fa5]" />
             <span>Size Nasıl Yardımcı Olabilirim?</span>
           </span>
-          <kbd className="rounded border border-[#dfe3e9] bg-white px-1.5 py-0.5 font-mono text-[9px] text-[#718096]">
+          <kbd className="rounded border border-[#dfe3e9] dark:border-[#26354a] bg-white dark:bg-[#1a2536] px-1.5 py-0.5 font-mono text-[9px] text-[#718096] dark:text-slate-300">
             Ctrl K
           </kbd>
         </button>
@@ -545,7 +551,7 @@ export function Header({ menuOpen, onToggleMenu }: HeaderProps) {
         {/* Right Action Icons & Profile */}
         <div
           ref={dropdownRef}
-          className="ml-auto flex items-center gap-2.5 text-[#43505f]"
+          className="ml-auto flex items-center gap-2.5 text-[#43505f] dark:text-[#94a3b8]"
         >
           {/* 1. BİLDİRİMLER (BELL İKONU) */}
           <div className="relative">
@@ -1196,8 +1202,108 @@ export function Header({ menuOpen, onToggleMenu }: HeaderProps) {
             )}
           </div>
 
+          {/* 4.5 TEMA DEĞİŞTİRİCİ (AÇIK / KOYU / SİSTEM) */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => toggleDropdown("theme")}
+              className={`relative flex size-8 items-center justify-center rounded-lg transition ${
+                activeDropdown === "theme"
+                  ? "bg-[#eef3ff] dark:bg-[#1f2d42] text-[#0c67dc] dark:text-blue-400"
+                  : "text-[#526174] dark:text-[#94a3b8] hover:bg-[#f1f4f9] dark:hover:bg-[#1a2536] hover:text-[#0c67dc] dark:hover:text-white"
+              }`}
+              aria-label="Arayüz Teması Değiştir"
+              title={`Görünüm Teması: ${theme === "dark" ? "Koyu Tema" : theme === "light" ? "Açık Tema" : "Sistem Teması"} (Değiştirmek için tıkla)`}
+            >
+              {resolvedTheme === "dark" ? (
+                <Moon className="size-[17px] text-amber-300 transition-transform hover:rotate-12" />
+              ) : (
+                <Sun className="size-[18px] text-amber-500 transition-transform hover:rotate-45" />
+              )}
+            </button>
+
+            {/* Tema Seçim Menüsü */}
+            {activeDropdown === "theme" && (
+              <div className="absolute right-0 top-11 z-50 w-56 rounded-xl border border-[#dfe3e9] dark:border-[#26354a] bg-white dark:bg-[#162130] p-1.5 shadow-2xl animate-in fade-in slide-in-from-top-1">
+                <div className="px-3 py-2 mb-1 border-b border-[#edf0f4] dark:border-[#223348]">
+                  <div className="text-[11.5px] font-bold text-[#172334] dark:text-white">
+                    Görünüm Teması
+                  </div>
+                  <div className="text-[9.5px] text-[#64748b] dark:text-[#8ea1ba] mt-0.5">
+                    Göz yormayan kamu çalışma modu
+                  </div>
+                </div>
+
+                <div className="space-y-0.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTheme("light");
+                      setActiveDropdown(null);
+                    }}
+                    className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-semibold transition ${
+                      theme === "light"
+                        ? "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-bold"
+                        : "text-[#475569] dark:text-[#94a3b8] hover:bg-[#f1f5f9] dark:hover:bg-[#1f2d42] hover:text-[#0f172a] dark:hover:text-white"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Sun className="size-4 text-amber-500" />
+                      <span>Açık Tema (Gündüz)</span>
+                    </div>
+                    {theme === "light" && (
+                      <Check className="size-3.5 text-blue-600 dark:text-blue-400" />
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTheme("dark");
+                      setActiveDropdown(null);
+                    }}
+                    className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-semibold transition ${
+                      theme === "dark"
+                        ? "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-bold"
+                        : "text-[#475569] dark:text-[#94a3b8] hover:bg-[#f1f5f9] dark:hover:bg-[#1f2d42] hover:text-[#0f172a] dark:hover:text-white"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Moon className="size-4 text-amber-300" />
+                      <span>Koyu Tema (Gece)</span>
+                    </div>
+                    {theme === "dark" && (
+                      <Check className="size-3.5 text-blue-600 dark:text-blue-400" />
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTheme("system");
+                      setActiveDropdown(null);
+                    }}
+                    className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-semibold transition ${
+                      theme === "system"
+                        ? "bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-bold"
+                        : "text-[#475569] dark:text-[#94a3b8] hover:bg-[#f1f5f9] dark:hover:bg-[#1f2d42] hover:text-[#0f172a] dark:hover:text-white"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Monitor className="size-4 text-slate-500 dark:text-slate-400" />
+                      <span>Sistem Tercihi (Otomatik)</span>
+                    </div>
+                    {theme === "system" && (
+                      <Check className="size-3.5 text-blue-600 dark:text-blue-400" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Divider */}
-          <div className="hidden h-7 w-px bg-[#e3e6eb] sm:block" />
+          <div className="hidden h-7 w-px bg-[#e3e6eb] dark:bg-[#26354a] sm:block" />
 
           {/* 5. KULLANICI PROFİLİ (AVATAR + KİMLİK KARTI) */}
           <div className="relative">
@@ -1226,56 +1332,56 @@ export function Header({ menuOpen, onToggleMenu }: HeaderProps) {
 
             {/* Kullanıcı Profili & Yetki Matrisi Menüsü */}
             {activeDropdown === "profile" && (
-              <div className="absolute right-0 top-12 z-50 w-80 rounded-xl border border-[#dfe3e9] bg-white p-4 shadow-2xl">
+              <div className="absolute right-0 top-12 z-50 w-80 rounded-xl border border-[#dfe3e9] dark:border-[#26354a] bg-white dark:bg-[#162130] p-4 shadow-2xl">
                 {/* Kullanıcı Kimlik Kartı */}
-                <div className="flex items-center gap-3 border-b border-[#edf0f4] pb-3">
+                <div className="flex items-center gap-3 border-b border-[#edf0f4] dark:border-[#223348] pb-3">
                   <div className="flex size-11 items-center justify-center rounded-full border-2 border-[#526174] bg-[#1e2a3c] text-white font-bold text-sm">
                     Aİ
                   </div>
                   <div>
-                    <div className="text-[13px] font-bold text-[#172334]">
+                    <div className="text-[13px] font-bold text-[#172334] dark:text-white">
                       Abdulkadir İlci
                     </div>
-                    <div className="font-mono text-[10px] font-semibold text-[#2d62d7]">
+                    <div className="font-mono text-[10px] font-semibold text-[#2d62d7] dark:text-blue-400">
                       lojtest1
                     </div>
-                    <div className="text-[10px] text-[#64748b]">
+                    <div className="text-[10px] text-[#64748b] dark:text-[#8ea1ba]">
                       Lojistik & Satın Alma Yöneticisi
                     </div>
                   </div>
                 </div>
 
                 {/* Yetki & Güvenlik Özeti */}
-                <div className="mt-2.5 rounded-lg border border-[#e2e8f0] bg-[#fafbfc] p-2.5 text-[10px] space-y-1 text-[#475569]">
+                <div className="mt-2.5 rounded-lg border border-[#e2e8f0] dark:border-[#243449] bg-[#fafbfc] dark:bg-[#121a27] p-2.5 text-[10px] space-y-1 text-[#475569] dark:text-[#a0aec0]">
                   <div className="flex justify-between">
-                    <span>E-İmza (NES) Durumu:</span>
-                    <strong className="text-emerald-700 flex items-center gap-1">
+                    <span className="text-[#64748b] dark:text-[#7d8fa5]">E-İmza (NES) Durumu:</span>
+                    <strong className="text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
                       <CheckCircle2 className="size-3" /> TÜRKTRUST Aktif
                     </strong>
                   </div>
                   <div className="flex justify-between">
-                    <span>Harcama Yetki Limiti:</span>
-                    <strong className="text-[#1e293b]">
-                      500.000 TL (Re'sen)
+                    <span className="text-[#64748b] dark:text-[#7d8fa5]">Harcama Yetki Limiti:</span>
+                    <strong className="text-[#1e293b] dark:text-slate-100">
+                      500.000 TL (Re&apos;sen)
                     </strong>
                   </div>
                   <div className="flex justify-between">
-                    <span>Komisyon Rolü:</span>
-                    <strong className="text-[#2d62d7]">
-                      4734 & 2886 Yetkilisi
+                    <span className="text-[#64748b] dark:text-[#7d8fa5]">Komisyon Rolü:</span>
+                    <strong className="text-[#2d62d7] dark:text-blue-400">
+                      4734 &amp; 2886 Yetkilisi
                     </strong>
                   </div>
                 </div>
 
                 {/* Lokasyon / İşletme Seçici */}
                 <div className="mt-3">
-                  <label className="text-[10px] font-bold text-[#64748b] uppercase tracking-wider block mb-1">
+                  <label className="text-[10px] font-bold text-[#64748b] dark:text-[#8ea1ba] uppercase tracking-wider block mb-1">
                     Aktif Lokasyon
                   </label>
                   <select
                     value={activeLocation}
                     onChange={(e) => setActiveLocation(e.target.value)}
-                    className="w-full rounded border border-[#cbd5e1] bg-white p-1.5 text-[11px] font-medium"
+                    className="w-full rounded border border-[#cbd5e1] dark:border-[#2b3c53] bg-white dark:bg-[#1a2536] text-[#1e293b] dark:text-slate-100 p-1.5 text-[11px] font-medium"
                   >
                     <option value="AKM-ANK - ODTÜ Teknokent">
                       AKM-ANK - ODTÜ Teknokent / Ankara
@@ -1286,12 +1392,31 @@ export function Header({ menuOpen, onToggleMenu }: HeaderProps) {
                   </select>
                 </div>
 
-                {/* Hızlı Linkler */}
-                <div className="mt-3 space-y-1 text-[11px] border-t border-[#edf0f4] pt-2">
+                {/* Hızlı Linkler & Tema Değiştirici */}
+                <div className="mt-3 space-y-1 text-[11px] border-t border-[#edf0f4] dark:border-[#223348] pt-2">
+                  {/* Tema Hızlı Geçiş Satırı */}
+                  <div className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-[#334155] dark:text-slate-300 transition hover:bg-[#f1f4f9] dark:hover:bg-[#1f2d42]">
+                    <div className="flex items-center gap-2.5">
+                      {resolvedTheme === "dark" ? (
+                        <Moon className="size-3.5 text-amber-400" />
+                      ) : (
+                        <Sun className="size-3.5 text-amber-500" />
+                      )}
+                      <span>Görünüm: {resolvedTheme === "dark" ? "Koyu" : "Açık"} Mod</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={toggleTheme}
+                      className="text-[10px] font-bold text-[#2d62d7] dark:text-blue-400 hover:underline"
+                    >
+                      {resolvedTheme === "dark" ? "Açığa Geç" : "Koyuya Geç"}
+                    </button>
+                  </div>
+
                   <Link
                     href="/genel-yonetim"
                     onClick={() => setActiveDropdown(null)}
-                    className="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[#334155] transition hover:bg-[#f1f4f9]"
+                    className="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[#334155] dark:text-slate-300 transition hover:bg-[#f1f4f9] dark:hover:bg-[#1f2d42]"
                   >
                     <User className="size-3.5 text-[#2d62d7]" />
                     <span>Kullanıcı Bilgileri & Birimler</span>
@@ -1299,7 +1424,7 @@ export function Header({ menuOpen, onToggleMenu }: HeaderProps) {
                   <Link
                     href="/belge-builder"
                     onClick={() => setActiveDropdown(null)}
-                    className="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[#334155] transition hover:bg-[#f1f4f9]"
+                    className="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[#334155] dark:text-slate-300 transition hover:bg-[#f1f4f9] dark:hover:bg-[#1f2d42]"
                   >
                     <FileSignature className="size-3.5 text-[#16a34a]" />
                     <span>İmza ve Paraf Yetkileri</span>
@@ -1307,7 +1432,7 @@ export function Header({ menuOpen, onToggleMenu }: HeaderProps) {
                   <Link
                     href="/sistem-ayarlari"
                     onClick={() => setActiveDropdown(null)}
-                    className="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[#334155] transition hover:bg-[#f1f4f9]"
+                    className="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[#334155] dark:text-slate-300 transition hover:bg-[#f1f4f9] dark:hover:bg-[#1f2d42]"
                   >
                     <Settings className="size-3.5 text-[#526174]" />
                     <span>Yetki Rolleri ve Parametreler</span>
@@ -1315,7 +1440,7 @@ export function Header({ menuOpen, onToggleMenu }: HeaderProps) {
                 </div>
 
                 {/* Çıkış Yap */}
-                <div className="mt-2.5 border-t border-[#edf0f4] pt-2">
+                <div className="mt-2.5 border-t border-[#edf0f4] dark:border-[#223348] pt-2">
                   <button
                     type="button"
                     onClick={() => {
