@@ -416,7 +416,7 @@ export function Header({ menuOpen, onToggleMenu }: HeaderProps) {
 
   return (
     <>
-      <header className="relative flex h-[58px] items-center border-b border-[#dfe3e9] bg-white px-4 shadow-[0_1px_3px_rgba(0,0,0,.04)] select-none">
+      <header className="sticky top-0 z-30 flex h-[58px] items-center border-b border-[#dfe3e9] bg-white px-4 shadow-[0_1px_3px_rgba(0,0,0,.04)] select-none">
         {/* Mobile Hamburger */}
         <button
           type="button"
