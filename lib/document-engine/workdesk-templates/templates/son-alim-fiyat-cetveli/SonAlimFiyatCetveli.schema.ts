@@ -1,0 +1,63 @@
+import { z } from 'zod';
+
+export const SonAlimFiyatCetveliItemSchema = z.object({
+  siraNo: z.any().optional(),
+  malzemeKodu: z.any().optional(),
+  malzemeAdi: z.any().optional(),
+  ozelligi: z.any().optional(),
+  birimi: z.any().optional(),
+  kdvOrani: z.any().optional(),
+  miktar: z.any().optional(),
+  birimFiyat: z.any().optional(),
+  toplamTutar: z.any().optional(),
+  kazananFirma: z.any().optional(),
+  alimTarihi: z.any().optional(),
+}).catchall(z.any());
+
+export const SonAlimFiyatCetveliSchema = z.object({
+  antetSatirlari: z.any().optional(),
+  evrakSayisi: z.any().optional(),
+  dosyaKonusu: z.any().optional(),
+  tarih: z.any().optional(),
+  onayaSunulanTarih: z.any().optional(),
+  onayTarihi: z.any().optional(),
+  dosyaTarihi: z.any().optional(),
+  kurumIci: z.any().optional(),
+  kurumAdres: z.any().optional(),
+  kurumTelefon: z.any().optional(),
+  kurumWeb: z.any().optional(),
+  kurumEposta: z.any().optional(),
+  kurumKep: z.any().optional(),
+  hazirlayanPersonelAdi: z.any().optional(),
+  hazirlayanPersonelUnvan: z.any().optional(),
+  hazirlayanTelefon: z.any().optional(),
+  hazirlayanEposta: z.any().optional(),
+  kontrolEdenPersonelAdi: z.any().optional(),
+  kontrolEdenPersonelUnvan: z.any().optional(),
+  onaylayanPersonelAdi: z.any().optional(),
+  onaylayanPersonelUnvan: z.any().optional(),
+  solLogo: z.any().optional(),
+  sagLogo: z.any().optional(),
+  fiyatKalemleri: z.array(SonAlimFiyatCetveliItemSchema).optional(),
+  ihtiyacKalemleri: z.array(z.any()).optional(),
+  genelToplam: z.any().optional(),
+  olurYazisi: z.any().optional(),
+  firstPageLimit: z.any().optional(),
+  middlePageLimit: z.any().optional(),
+  lastPageLimit: z.any().optional(),
+  // EK-1: TÜİK Yİ-ÜFE ile güncel fiyat eki
+  yiUfeEndeksleri: z
+    .array(z.object({ yil: z.number(), ay: z.number(), endeks: z.number() }))
+    .optional(),
+  yiUfeEkiGoster: z.any().optional(),
+  yiUfeHedefYil: z.any().optional(),
+  yiUfeHedefAy: z.any().optional(),
+  yiUfeEkiAciklama: z.any().optional(),
+  // KİK / Standart Form Bilgileri (İsteğe Bağlı)
+  kikKodu: z.string().optional(),
+  kikAdi: z.string().optional(),
+  standartFormKodu: z.string().optional(),
+  standartFormAdi: z.string().optional(),
+}).catchall(z.any());
+
+export type SonAlimFiyatCetveliType = z.infer<typeof SonAlimFiyatCetveliSchema>;

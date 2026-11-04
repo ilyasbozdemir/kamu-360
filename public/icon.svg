@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="kamuGradient" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="45%" stop-color="#1e3a8a" />
+      <stop offset="100%" stop-color="#2563eb" />
+    </linearGradient>
+    <linearGradient id="accentGradient" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+  </defs>
+  <!-- Background Rounded Shield -->
+  <rect width="128" height="128" rx="28" fill="url(#kamuGradient)" />
+  <rect x="3" y="3" width="122" height="122" rx="25" stroke="#38bdf8" stroke-opacity="0.3" stroke-width="2" />
+  
+  <!-- Outer Orbit (360 Degree Ring) -->
+  <circle cx="64" cy="64" r="44" stroke="#38bdf8" stroke-width="3" stroke-opacity="0.25" stroke-dasharray="6 6" />
+  <circle cx="64" cy="64" r="34" stroke="url(#accentGradient)" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="160 50" transform="rotate(-45 64 64)" />
+
+  <!-- Central Emblem / Pillar (Kamu / Devlet İhale / Adalet & Güven) -->
+  <path d="M64 36 L86 50 L86 78 L64 92 L42 78 L42 50 Z" fill="#ffffff" fill-opacity="0.08" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round" />
+  <circle cx="64" cy="64" r="8" fill="url(#accentGradient)" />
+
+  <!-- 360 Compass Stars / Orbiting Nodes -->
+  <circle cx="64" cy="24" r="3.5" fill="#38bdf8" />
+  <circle cx="104" cy="64" r="3.5" fill="#38bdf8" />
+  <circle cx="64" cy="104" r="3.5" fill="#38bdf8" />
+  <circle cx="24" cy="64" r="3.5" fill="#38bdf8" />
+</svg>
+
