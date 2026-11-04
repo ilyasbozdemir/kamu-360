@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import {
   Coins,
   FileSpreadsheet,
@@ -115,9 +116,17 @@ const INITIAL_TKYS_ITEMS = [
   },
 ]
 
-export default function BkmybsMaliYonetimPage() {
+function BkmybsMaliYonetimContent() {
+  const searchParams = useSearchParams()
   const [activeTab, setActiveTab] = useState<'butce' | 'mif' | 'tkys' | 'emanet'>('butce')
   const [searchQuery, setSearchQuery] = useState('')
+
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    if (tab === 'butce' || tab === 'mif' || tab === 'tkys' || tab === 'emanet') {
+      setActiveTab(tab)
+    }
+  }, [searchParams])
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f8fafc]">
@@ -445,6 +454,14 @@ export default function BkmybsMaliYonetimPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function BkmybsMaliYonetimPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-xs text-slate-500">BKMYBS & Mali Yönetim Modülü Yükleniyor...</div>}>
+      <BkmybsMaliYonetimContent />
+    </Suspense>
   )
 }
 

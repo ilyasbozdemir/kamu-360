@@ -209,14 +209,14 @@ export function Sidebar({ menuOpen, onCloseMenu }: SidebarProps) {
     if (href === '/temin-dosyasi') {
       return pathname === '/temin-dosyasi' || pathname.startsWith('/temin-dosyasi')
     }
-    if (href.includes('?view=liste')) {
-      const [base] = href.split('?')
+    if (href.includes('?')) {
+      const [base, query] = href.split('?')
       if (typeof window !== 'undefined') {
-        return pathname === base && window.location.search.includes('view=liste')
+        return pathname === base && window.location.search.includes(query)
       }
-      return false
+      return pathname === base
     }
-    if (typeof window !== 'undefined' && window.location.search.includes('view=liste')) {
+    if (typeof window !== 'undefined' && window.location.search.includes('tab=')) {
       return false
     }
     return pathname === href
@@ -356,26 +356,26 @@ export function Sidebar({ menuOpen, onCloseMenu }: SidebarProps) {
               icon: Compass,
               label: '1. Canlı CBS Harita Katmanı',
               shortLabel: '1. CBS Canlı Harita',
-              href: '/harita-altyapi',
+              href: '/harita-altyapi?tab=harita',
               sectionTitle: 'Harita Katmanları & GIS',
             },
             {
               icon: Building2,
               label: '2. Arazi & Parsel Mülkiyet Takibi',
               shortLabel: '2. Arazi & Parsel',
-              href: '/harita-altyapi',
+              href: '/harita-altyapi?tab=arazi',
             },
             {
               icon: Droplets,
               label: '3. Su Şebekesi & İsale Hatları',
               shortLabel: '3. Su Şebekesi',
-              href: '/harita-altyapi',
+              href: '/harita-altyapi?tab=su',
             },
             {
               icon: Gauge,
               label: '4. Sayaç & Abone Yönetimi',
               shortLabel: '4. Sayaç & Abone',
-              href: '/harita-altyapi',
+              href: '/harita-altyapi?tab=abone',
             },
             {
               icon: Table,
@@ -409,27 +409,27 @@ export function Sidebar({ menuOpen, onCloseMenu }: SidebarProps) {
               icon: Users,
               label: '1. Personel Özlük & Sicil Listesi',
               shortLabel: '1. Özlük & Sicil',
-              href: '/personel-takibi',
+              href: '/personel-takibi?tab=ozluk',
               sectionTitle: '657 & 4857 Özlük Masası',
             },
             {
               icon: FileText,
               label: '2. Puantaj & İzin Masası',
               shortLabel: '2. Puantaj & İzin',
-              href: '/personel-takibi',
+              href: '/personel-takibi?tab=puantaj',
             },
             {
               icon: Briefcase,
               label: '3. Görevlendirme & Harcırah (6245)',
               shortLabel: '3. Harcırah & Görev',
-              href: '/personel-takibi',
+              href: '/personel-takibi?tab=harcirah',
               badge: '6245',
             },
             {
               icon: Award,
               label: '4. Kademe, Terfi & Disiplin',
               shortLabel: '4. Terfi & Disiplin',
-              href: '/personel-takibi',
+              href: '/personel-takibi?tab=terfi',
             },
             {
               icon: Network,
@@ -463,28 +463,28 @@ export function Sidebar({ menuOpen, onCloseMenu }: SidebarProps) {
               icon: Coins,
               label: '1. Analitik Bütçe Kodları & Ödenek',
               shortLabel: '1. Analitik Bütçe',
-              href: '/bkmybs-mali-yonetim',
+              href: '/bkmybs-mali-yonetim?tab=butce',
               sectionTitle: '5018 Mali İşlemler',
             },
             {
               icon: FileSpreadsheet,
               label: '2. MİF & Ödeme Emri Belgesi (ÖEB)',
               shortLabel: '2. MİF & Ödeme Emri',
-              href: '/bkmybs-mali-yonetim',
+              href: '/bkmybs-mali-yonetim?tab=mif',
               badge: 'ÖEB',
             },
             {
               icon: Package,
               label: '3. TKYS Taşınır Mal Yönetimi & Zimmet',
               shortLabel: '3. TKYS Taşınır Mal',
-              href: '/bkmybs-mali-yonetim',
+              href: '/bkmybs-mali-yonetim?tab=tkys',
               badge: 'TİF',
             },
             {
               icon: ShieldCheck,
               label: '4. Emanetler & Teminat Mektupları',
               shortLabel: '4. Teminat Mektubu',
-              href: '/bkmybs-mali-yonetim',
+              href: '/bkmybs-mali-yonetim?tab=emanet',
             },
             {
               icon: FileSignature,
@@ -851,7 +851,7 @@ export function Sidebar({ menuOpen, onCloseMenu }: SidebarProps) {
                                     const childActive = isChildActive(child.href)
 
                                     return (
-                                      <React.Fragment key={child.href}>
+                                      <React.Fragment key={`${section.id}-${item.label}-${child.label}-${child.href}`}>
                                         {child.sectionTitle && (
                                           <div className="pt-2 pb-1 px-2 flex items-center gap-1.5 text-[8.5px] font-black uppercase tracking-wider text-[#637893]">
                                             <span

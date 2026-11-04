@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import {
   MapPin,
   Layers,
@@ -148,11 +149,19 @@ const INITIAL_SUBSCRIBERS = [
   },
 ]
 
-export default function HaritaAltyapiPage() {
+function HaritaAltyapiContent() {
+  const searchParams = useSearchParams()
   const [activeTab, setActiveTab] = useState<'harita' | 'arazi' | 'su' | 'abone'>('harita')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedLayer, setSelectedLayer] = useState<'uydu' | 'imar' | 'kombine'>('kombine')
   const [filterDurum, setFilterDurum] = useState('all')
+
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    if (tab === 'harita' || tab === 'arazi' || tab === 'su' || tab === 'abone') {
+      setActiveTab(tab)
+    }
+  }, [searchParams])
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f8fafc]">
@@ -604,6 +613,14 @@ export default function HaritaAltyapiPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function HaritaAltyapiPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-xs text-slate-500">Harita & Altyapı Modülü Yükleniyor...</div>}>
+      <HaritaAltyapiContent />
+    </Suspense>
   )
 }
 

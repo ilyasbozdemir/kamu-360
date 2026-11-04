@@ -1,6 +1,7 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import {
   Users,
   UserCheck,
@@ -95,9 +96,17 @@ const INITIAL_TRAVEL_ORDERS = [
   },
 ]
 
-export default function PersonelTakibiPage() {
+function PersonelTakibiContent() {
+  const searchParams = useSearchParams()
   const [activeTab, setActiveTab] = useState<'ozluk' | 'puantaj' | 'harcirah' | 'terfi'>('ozluk')
   const [searchQuery, setSearchQuery] = useState('')
+
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    if (tab === 'ozluk' || tab === 'puantaj' || tab === 'harcirah' || tab === 'terfi') {
+      setActiveTab(tab)
+    }
+  }, [searchParams])
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f8fafc]">
@@ -389,6 +398,14 @@ export default function PersonelTakibiPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function PersonelTakibiPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-xs text-slate-500">Personel & İK Modülü Yükleniyor...</div>}>
+      <PersonelTakibiContent />
+    </Suspense>
   )
 }
 
