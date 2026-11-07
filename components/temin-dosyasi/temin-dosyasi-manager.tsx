@@ -37,6 +37,8 @@ import {
   Upload,
   User,
   Users,
+  Coins,
+  ExternalLink,
 } from "lucide-react";
 import {
   ORNEK_TEMIN_DOSYALARI,
@@ -49,6 +51,13 @@ import {
 import { TEMPLATE_REGISTRY } from "@/lib/document-engine/registry";
 import { PrintJob, usePrintHub } from "@/lib/print-hub-context";
 import { UniversalDocumentModal } from "@/components/document-preview/universal-document-modal";
+import { DogrudanTeminLimitCard } from "@/components/bkmybs/dogrudan-temin-limit-card";
+import { OebBelgeModal } from "@/components/bkmybs/oeb-belge-modal";
+import {
+  createMifFromTeminDosyasi,
+  MifKaydi,
+  getStoredMifList,
+} from "@/lib/bkmybs/mali-entegrasyon";
 
 export function TeminDosyasiManager() {
   const { addToPrintQueue } = usePrintHub();
@@ -64,6 +73,7 @@ export function TeminDosyasiManager() {
     | "personel"
     | "rota"
     | "belgeler"
+    | "bkmybs"
   >("idari");
   const [seciliSablonKodu, setSeciliSablonKodu] = useState<string>(
     "DOC_ONAY_BELGESI",
@@ -72,6 +82,11 @@ export function TeminDosyasiManager() {
   const [isDbConnected, setIsDbConnected] = useState<boolean>(false);
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isOebModalOpen, setIsOebModalOpen] = useState(false);
+  const [activeMifForModal, setActiveMifForModal] = useState<MifKaydi | null>(null);
+  const [seciliTertip, setSeciliTertip] = useState<string>(
+    "34.01.02.45 - 01.3.1.00 - 05 - 03.2.1.01",
+  );
   const [modalJobs, setModalJobs] = useState<PrintJob[]>([]);
   const [modalActiveId, setModalActiveId] = useState<string>("");
   const [snapshotRevision, setSnapshotRevision] = useState<number>(1);
@@ -474,6 +489,17 @@ export function TeminDosyasiManager() {
     setTimeout(() => setKayitMesaji(null), 4000);
   };
 
+  const handleTransferToBkmybs = () => {
+    const { mif } = createMifFromTeminDosyasi(aktifDosya, {
+      customTertip: seciliTertip,
+    });
+    setActiveMifForModal(mif);
+    setKayitMesaji(
+      `"${aktifDosya.temin_no}" dosyası BKMYBS sistemine aktarıldı! ${mif.mifNo} / ${mif.oebNo} oluşturuldu.`,
+    );
+    setTimeout(() => setKayitMesaji(null), 4000);
+  };
+
   return (
     <div className="space-y-3 pb-8">
       {/* 1. ÜST BREADCRUMB & KOMUTA MERKEZİ - Satın Alma Temasıyla 1:1 Uyumlu */}
@@ -796,6 +822,22 @@ export function TeminDosyasiManager() {
               </span>
               <span className="rounded-sm bg-[#2d62d7] px-1 py-0.2 text-[9.5px] font-semibold text-white">
                 8
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab("bkmybs")}
+              className={`flex items-center gap-1.5 border-b-2 px-3 py-2 font-bold transition ${
+                activeTab === "bkmybs"
+                  ? "border-amber-600 text-amber-800 bg-white rounded-t shadow-xs"
+                  : "border-transparent text-amber-900/80 hover:text-amber-900 hover:bg-amber-50/50"
+              }`}
+            >
+              <Coins className="size-3.5 text-amber-600" />
+              <span>8. BKMYBS &amp; Ödenek (5018)</span>
+              <span className="rounded-sm bg-amber-100 px-1 py-0.2 text-[9.5px] font-semibold text-amber-800">
+                MİF/ÖEB
               </span>
             </button>
           </div>
@@ -1808,6 +1850,181 @@ export function TeminDosyasiManager() {
             </div>
           </div>
         )}
+
+        {/* ===================== SEKME 8: BKMYBS & MALİ YÖNETİM (5018) ===================== */}
+        {activeTab === "bkmybs" && (
+          <div className="p-4 space-y-4">
+            {/* 1. 22/d Canlı Parasal Limit & %10 KİK Kota Kartı */}
+            <DogrudanTeminLimitCard
+              currentDosyaTutar={aktifDosya.yaklasik_maliyet}
+              currentDosyaNo={aktifDosya.temin_no}
+              showBirimBreakdown={true}
+            />
+
+            {/* 2. MİF & Ödeme Emri Belgesi (ÖEB) Hazırlama Köprüsü */}
+            <div className="bg-white border border-[#e2e8f0] rounded-2xl p-5 shadow-xs">
+              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-[#f1f5f9]">
+                <div>
+                  <h4 className="text-xs font-bold text-[#0f172a] flex items-center gap-2">
+                    <Coins className="size-4 text-amber-600" />
+                    <span>BKMYBS / MYS Ödeme Emri Belgesi (ÖEB) ve Tahakkuk Masası</span>
+                    <span className="px-2 py-0.5 text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md">
+                      Mali Entegrasyon
+                    </span>
+                  </h4>
+                  <p className="text-[11px] text-[#64748b] mt-0.5">
+                    Piyasa fiyat araştırması kesinleşen alımın analitik bütçe tertibiyle eşleştirilerek ödeme emrine dönüştürülmesi
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/bkmybs-mali-yonetim?tab=mif"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition"
+                  >
+                    <ExternalLink className="size-3" />
+                    <span>BKMYBS Portalını Aç</span>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Form & Özet Bilgiler */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                {/* Sol Sütun: Bütçe Tertibi & İdari Bilgiler */}
+                <div className="space-y-3 bg-[#f8fafc] border border-[#e2e8f0] p-4 rounded-xl text-xs">
+                  <div className="font-bold text-[#0f172a] border-b border-[#e2e8f0] pb-1.5 flex items-center justify-between">
+                    <span>1. Analitik Bütçe Tertibi &amp; Ödenek</span>
+                    <span className="text-[10px] text-amber-800 font-mono">5018 Sayılı K.</span>
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-semibold text-[#475569] block mb-1">
+                      Ödeneğin Karşılanacağı Bütçe Tertibi:
+                    </label>
+                    <select
+                      value={seciliTertip}
+                      onChange={(e) => setSeciliTertip(e.target.value)}
+                      className="w-full bg-white border border-[#cbd5e1] rounded-lg px-2.5 py-1.5 text-xs text-[#0f172a] font-mono focus:border-amber-600 focus:outline-hidden"
+                    >
+                      <option value="34.01.02.45 - 01.3.1.00 - 05 - 03.2.1.01">
+                        34.01.02.45 - 01.3.1.00 - 05 - 03.2.1.01 (Kırtasiye ve Büro Malzemesi Alımları)
+                      </option>
+                      <option value="34.01.02.45 - 01.3.1.00 - 05 - 03.5.2.02">
+                        34.01.02.45 - 01.3.1.00 - 05 - 03.5.2.02 (Taşıt ve İş Makinesi Kiralama)
+                      </option>
+                      <option value="34.01.02.45 - 06.1.1.00 - 05 - 06.5.7.01">
+                        34.01.02.45 - 06.1.1.00 - 05 - 06.5.7.01 (Yazılım ve Bilişim Lisans Alımları)
+                      </option>
+                      <option value="34.01.02.45 - 04.3.1.00 - 05 - 03.7.1.01">
+                        34.01.02.45 - 04.3.1.00 - 05 - 03.7.1.01 (Su Şebekesi &amp; Vana Onarım Giderleri)
+                      </option>
+                    </select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-[11px]">
+                    <div>
+                      <span className="text-[#64748b] block text-[10px]">Harcama Birimi:</span>
+                      <span className="font-semibold text-[#0f172a]">{aktifDosya.birim}</span>
+                    </div>
+                    <div>
+                      <span className="text-[#64748b] block text-[10px]">Alım Türü:</span>
+                      <span className="font-semibold text-amber-900 uppercase">
+                        {aktifDosya.tur === "mal" ? "Mal Alımı (TKYS Zorunlu)" : "Hizmet Alımı"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] flex items-center justify-between">
+                    <span>Tertip Kalan Serbest Ödeneği:</span>
+                    <span className="font-bold font-mono text-sm">1.249.550,00 ₺</span>
+                  </div>
+                </div>
+
+                {/* Sağ Sütun: Kazanan Yüklenici & Yasal Kesintiler */}
+                <div className="space-y-3 bg-[#f8fafc] border border-[#e2e8f0] p-4 rounded-xl text-xs">
+                  <div className="font-bold text-[#0f172a] border-b border-[#e2e8f0] pb-1.5 flex items-center justify-between">
+                    <span>2. Hakediş &amp; Yasal Kesintiler Cetveli</span>
+                    <span className="text-[10px] text-emerald-700 font-semibold">Firma Onaylı</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-[11px]">
+                    <div>
+                      <span className="text-[#64748b] block text-[10px]">Kazanan Yüklenici:</span>
+                      <span className="font-bold text-[#0f172a]">
+                        {aktifDosya.kazanan_firma_adi || "Henüz Seçilmedi"}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[#64748b] block text-[10px]">Brüt Teklif Bedeli:</span>
+                      <span className="font-mono font-bold text-slate-900">
+                        {aktifDosya.yaklasik_maliyet.toLocaleString("tr-TR", {
+                          minimumFractionDigits: 2,
+                        })}{" "}
+                        ₺
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Kesinti Listesi */}
+                  <div className="border border-[#e2e8f0] bg-white rounded-lg p-2.5 space-y-1.5 text-[11px]">
+                    <div className="flex justify-between text-[#64748b]">
+                      <span>Damga Vergisi (Binde 9,48):</span>
+                      <span className="font-mono font-medium text-slate-700">
+                        {aktifDosya.kesinti_damga.toLocaleString("tr-TR", {
+                          minimumFractionDigits: 2,
+                        })}{" "}
+                        ₺
+                      </span>
+                    </div>
+                    {aktifDosya.kesinti_karar_pulu > 0 && (
+                      <div className="flex justify-between text-[#64748b]">
+                        <span>Karar Pulu (Binde 5,69):</span>
+                        <span className="font-mono font-medium text-slate-700">
+                          {aktifDosya.kesinti_karar_pulu.toLocaleString("tr-TR", {
+                            minimumFractionDigits: 2,
+                          })}{" "}
+                          ₺
+                        </span>
+                      </div>
+                    )}
+                    <div className="flex justify-between pt-1.5 border-t border-[#f1f5f9] font-bold text-[#0f172a]">
+                      <span className="text-emerald-800">Net Ödenecek Tutar:</span>
+                      <span className="font-mono text-emerald-700 text-sm">
+                        {aktifDosya.net_odenen.toLocaleString("tr-TR", {
+                          minimumFractionDigits: 2,
+                        })}{" "}
+                        ₺
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Aksiyon Butonları */}
+                  <div className="flex items-center gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={handleTransferToBkmybs}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 rounded-lg shadow-xs transition"
+                    >
+                      <Coins className="size-3.5" />
+                      <span>⚡ BKMYBS&apos;ye Aktar &amp; ÖEB Üret</span>
+                    </button>
+
+                    {activeMifForModal && (
+                      <button
+                        type="button"
+                        onClick={() => setIsOebModalOpen(true)}
+                        className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-900 bg-white border border-[#cbd5e1] hover:bg-slate-50 rounded-lg transition"
+                      >
+                        <Printer className="size-3.5" />
+                        <span>ÖEB Matbu Gör</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 4. EVRENSEL CANLI A4 ÖNİZLEME MODALI */}
@@ -1821,6 +2038,13 @@ export function TeminDosyasiManager() {
           dosyaVerisi={aktifDosya}
         />
       )}
+
+      {/* 5. 5018 ÖDEME EMRİ BELGESİ (ÖEB) A4 MATBU MODALI */}
+      <OebBelgeModal
+        mif={activeMifForModal}
+        isOpen={isOebModalOpen}
+        onClose={() => setIsOebModalOpen(false)}
+      />
     </div>
   );
 }
